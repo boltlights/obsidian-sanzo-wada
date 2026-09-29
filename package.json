@@ -1,0 +1,30 @@
+{
+  "name": "obsidian-sanzo-wada",
+  "version": "1.0.0",
+  "description": "Obsidian plugin to render, search, and insert Sanzo Wada color combinations",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "color-palette",
+    "sanzo-wada",
+    "colors"
+  ],
+  "author": "boltlights",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.20.2",
+    "obsidian": "latest",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "dictionary-of-colour-combinations": "^1.0.1"
+  }
+}
