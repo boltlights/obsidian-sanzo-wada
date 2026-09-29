@@ -1,8 +1,8 @@
 {
-  "id": "obsidian-sanzo-wada",
+  "id": "sanzo-wada",
   "name": "Sanzo Wada Color Combinations",
-  "version": "1.0.0",
-  "minAppVersion": "0.15.0",
+  "version": "1.0.2",
+  "minAppVersion": "1.5.0",
   "description": "Fenced code block processor, palette modal, and clipboard tools for Sanzo Wada's 348 classic color combinations.",
   "author": "boltlights",
   "authorUrl": "https://github.com/boltlights",

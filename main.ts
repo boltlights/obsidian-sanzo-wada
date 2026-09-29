@@ -92,14 +92,14 @@ export default class SanzoWadaPlugin extends Plugin {
     // 4. Register the `sanzo` fenced code block processor
     this.registerMarkdownCodeBlockProcessor(
       "sanzo",
-      (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+      (source: string, el: HTMLElement, _ctx: MarkdownPostProcessorContext) => {
         this.renderSanzoCodeBlock(source, el);
       }
     );
 
     // 5. Ribbon icon: Opens the sidebar in the right leaf
     this.addRibbonIcon("palette", "Sanzo Wada Palettes", () => {
-      this.activateView();
+      void this.activateView();
     });
 
     // 6. Command: Open Sanzo Wada sidebar
@@ -107,7 +107,7 @@ export default class SanzoWadaPlugin extends Plugin {
       id: "open-sanzo-sidebar",
       name: "Open Sanzo Wada sidebar",
       callback: () => {
-        this.activateView();
+        void this.activateView();
       },
     });
 
@@ -125,8 +125,9 @@ export default class SanzoWadaPlugin extends Plugin {
   }
 
   onunload(): void {
-    // Detach leaves when plugin is unloaded
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE_SANZO_SIDEBAR);
+    // Intentionally empty.
+    // Obsidian manages leaf cleanup automatically; calling detachLeavesOfType here
+    // would reset the user's custom placement of the sidebar on plugin reload.
   }
 
   async loadSettings(): Promise<void> {
@@ -176,14 +177,14 @@ export default class SanzoWadaPlugin extends Plugin {
     if (leaves.length > 0) {
       leaf = leaves[0];
     } else {
-      leaf = workspace.getRightLeaf(false) || workspace.getLeaf(true);
+      leaf = workspace.getRightLeaf(false) ?? workspace.getLeaf(true);
       if (leaf) {
         await leaf.setViewState({ type: VIEW_TYPE_SANZO_SIDEBAR, active: true });
       }
     }
 
     if (leaf) {
-      workspace.revealLeaf(leaf);
+      await workspace.revealLeaf(leaf);
     }
   }
 
@@ -207,7 +208,7 @@ export default class SanzoWadaPlugin extends Plugin {
       activeEditor.replaceSelection(outputText);
       new Notice(`Inserted Sanzo Wada palette #${combo.id}`);
     } else {
-      navigator.clipboard.writeText(outputText);
+      void navigator.clipboard.writeText(outputText);
       new Notice(`Copied Sanzo Wada palette #${combo.id} to clipboard!`);
     }
   }
@@ -255,7 +256,7 @@ export default class SanzoWadaPlugin extends Plugin {
         targetEditor.replaceSelection(outputText);
         new Notice(`Inserted Sanzo Wada palette #${combination.id}`);
       } else {
-        navigator.clipboard.writeText(outputText);
+        void navigator.clipboard.writeText(outputText);
         new Notice(
           `Copied Sanzo Wada palette #${combination.id} to clipboard!`
         );
@@ -342,7 +343,7 @@ export default class SanzoWadaPlugin extends Plugin {
     copyAllBtn.addEventListener("click", (e: MouseEvent) => {
       e.stopPropagation();
       const allHex = colors.map((c) => c.hex).join(", ");
-      navigator.clipboard.writeText(allHex);
+      void navigator.clipboard.writeText(allHex);
       new Notice(`Copied palette #${comboId} (${allHex}) to clipboard!`);
     });
 
@@ -382,7 +383,7 @@ export default class SanzoWadaPlugin extends Plugin {
 
       // Click to copy color hex
       item.addEventListener("click", () => {
-        navigator.clipboard.writeText(color.hex);
+        void navigator.clipboard.writeText(color.hex);
         new Notice(`Copied ${color.name} (${color.hex}) to clipboard!`);
       });
     }
@@ -485,7 +486,7 @@ export class SanzoSidebarView extends ItemView {
   }
 
   async onClose(): Promise<void> {
-    // Clean-up if needed
+    // No cleanup needed - Obsidian manages the DOM lifecycle
   }
 
   /**
@@ -628,11 +629,9 @@ export class SanzoSidebarView extends ItemView {
       },
     });
 
-    starBtn.addEventListener("click", async (e: MouseEvent) => {
+    starBtn.addEventListener("click", (e: MouseEvent) => {
       e.stopPropagation();
-      await this.plugin.toggleFavorite(combo.id);
-      this.renderFavorites();
-      this.renderResults();
+      void this.handleFavoriteToggle(combo);
     });
 
     // Horizontal Color Strip
@@ -657,6 +656,15 @@ export class SanzoSidebarView extends ItemView {
     });
 
     return row;
+  }
+
+  /**
+   * Handles the async favorite-toggle work for a row, called via `void` from the click handler.
+   */
+  private async handleFavoriteToggle(combo: SanzoCombination): Promise<void> {
+    await this.plugin.toggleFavorite(combo.id);
+    this.renderFavorites();
+    this.renderResults();
   }
 }
 
@@ -769,7 +777,7 @@ class SanzoPaletteModal extends Modal {
     });
 
     renderResults();
-    setTimeout(() => searchInput.focus(), 50);
+    window.setTimeout(() => searchInput.focus(), 50);
   }
 
   onClose(): void {
@@ -793,9 +801,9 @@ class SanzoSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h2", {
-      text: "Sanzo Wada Color Combinations Settings",
-    });
+    new Setting(containerEl)
+      .setName("Sanzo Wada Color Combinations Settings")
+      .setHeading();
 
     // Toggle: Show color names
     new Setting(containerEl)
