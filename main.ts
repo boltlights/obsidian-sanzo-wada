@@ -801,10 +801,6 @@ class SanzoSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    new Setting(containerEl)
-      .setName("Sanzo Wada Color Combinations Settings")
-      .setHeading();
-
     // Toggle: Show color names
     new Setting(containerEl)
       .setName("Show color names under swatches")
