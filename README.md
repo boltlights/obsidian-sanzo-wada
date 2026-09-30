@@ -122,6 +122,17 @@ npm run dev
 
 ---
 
+## Permissions
+
+This plugin uses the system clipboard only when you explicitly trigger it:
+
+- **Copy All HEX** button on rendered palettes.
+- **Click a swatch** to copy its hex code.
+
+No clipboard reading, monitoring, or background access occurs.
+
+---
+
 ## Credits & Attribution
 
 This plugin would not be possible without the incredible work of others. The color data used here is from the `dictionary-of-colour-combinations` package.

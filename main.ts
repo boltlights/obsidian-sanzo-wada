@@ -787,7 +787,7 @@ class SanzoPaletteModal extends Modal {
 }
 
 /**
- * Plugin Settings Tab
+ * Plugin Settings Tab (Declarative API, Obsidian 1.13+)
  */
 class SanzoSettingTab extends PluginSettingTab {
   plugin: SanzoWadaPlugin;
@@ -797,50 +797,52 @@ class SanzoSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  display(): void {
-    const { containerEl } = this;
-    containerEl.empty();
-
-    // Toggle: Show color names
-    new Setting(containerEl)
-      .setName("Show color names under swatches")
-      .setDesc("Displays Sanzo Wada's original color names beneath each swatch card.")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.showColorNames)
-          .onChange(async (value: boolean) => {
+  getSettingDefinitions() {
+    return [
+      {
+        name: "Show color names under swatches",
+        desc: "Displays Sanzo Wada's original color names beneath each swatch card.",
+        control: {
+          type: "toggle" as const,
+          key: "showColorNames",
+          value: this.plugin.settings.showColorNames,
+          onChange: async (value: boolean) => {
             this.plugin.settings.showColorNames = value;
             await this.plugin.saveSettings();
-          })
-      );
-
-    // Toggle: Show hex codes
-    new Setting(containerEl)
-      .setName("Show hex codes under swatches")
-      .setDesc("Displays uppercase HEX codes beneath each swatch card.")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.showHexCodes)
-          .onChange(async (value: boolean) => {
+          },
+        },
+      },
+      {
+        name: "Show hex codes under swatches",
+        desc: "Displays uppercase HEX codes beneath each swatch card.",
+        control: {
+          type: "toggle" as const,
+          key: "showHexCodes",
+          value: this.plugin.settings.showHexCodes,
+          onChange: async (value: boolean) => {
             this.plugin.settings.showHexCodes = value;
             await this.plugin.saveSettings();
-          })
-      );
-
-    // Dropdown: Default output format
-    new Setting(containerEl)
-      .setName("Default output format")
-      .setDesc("The syntax format inserted when picking a combination from the palette modal or sidebar.")
-      .addDropdown((dropdown) =>
-        dropdown
-          .addOption("codeblock", "Fenced Codeblock (```sanzo <id>)")
-          .addOption("markdown-swatches", "Markdown Blockquote & Badges")
-          .addOption("hex-list", "Comma-separated HEX list")
-          .setValue(this.plugin.settings.defaultOutputFormat)
-          .onChange(async (value: "codeblock" | "markdown-swatches" | "hex-list") => {
-            this.plugin.settings.defaultOutputFormat = value;
+          },
+        },
+      },
+      {
+        name: "Default output format",
+        desc: "The syntax format inserted when picking a combination from the palette modal or sidebar.",
+        control: {
+          type: "dropdown" as const,
+          key: "defaultOutputFormat",
+          value: this.plugin.settings.defaultOutputFormat,
+          options: {
+            codeblock: "Fenced Codeblock (```sanzo <id>)",
+            "markdown-swatches": "Markdown Blockquote & Badges",
+            "hex-list": "Comma-separated HEX list",
+          },
+          onChange: async (value: string) => {
+            this.plugin.settings.defaultOutputFormat = value as SanzoPluginSettings["defaultOutputFormat"];
             await this.plugin.saveSettings();
-          })
-      );
+          },
+        },
+      },
+    ];
   }
 }
